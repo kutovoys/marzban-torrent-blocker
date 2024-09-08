@@ -1,0 +1,40 @@
+version: 2
+
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod tidy
+
+snapshot:
+  version_template: "{{ .Tag }}"
+checksum:
+  name_template: "checksums.txt"
+
+builds:
+  - id: build
+    binary: bin/torrent-blocker
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - openbsd
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.Version={{ .Tag }}
+
+archives:
+  - id: torrent-blocker
+    format: tar.gz
+    name_template: "{{ .ProjectName }}-v{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+    files:
+      - none*
+
+release:
+  github:
+    owner: kutovoys
+    name: marzban-torrent-blocker
+  name_template: "{{ .ProjectName }}-v{{ .Version }}"
