@@ -46,7 +46,7 @@ curl -sL "$URL" -o torrent-blocker.tar.gz
 
 echo "Extracting files..."
 mkdir -p /opt/torrent-blocker
-tar -xzf torrent-blocker.tar.gz -C /opt/torrent-blocker torrent-blocker --overwrite
+tar -xzf torrent-blocker.tar.gz -C /opt/torrent-blocker --overwrite
 rm torrent-blocker.tar.gz
 
 CONFIG_PATH="/opt/torrent-blocker/config.yaml"
