@@ -4,6 +4,7 @@
 [![ru](https://img.shields.io/badge/lang-ru-blue)](https://github.com/kutovoys/marzban-torrent-blocker/blob/main/README.ru.md)
 
 Marzban Torrent Blocker — это приложение для блокировки использования торрентов пользователями панели [Marzban](https://github.com/Gozargah/Marzban). Приложение анализирует логи, обнаруживает использование торрентов и временно блокирует пользователя, отправляя уведомления в Telegram администратору и, опционально, пользователю.
+Возможна работа и с другими панелями. А также напрямую с Xray.
 
 ## Возможности:
 
