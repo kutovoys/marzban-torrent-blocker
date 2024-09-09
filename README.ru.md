@@ -1,6 +1,7 @@
 # Marzban Torrent Blocker
 
-[English](https://github.com/kutovoys/marzban-torrent-blocker) | [Russian](https://github.com/kutovoys/marzban-torrent-blocker/blob/main/README_RU.md)
+[![en](https://img.shields.io/badge/lang-en-red)](https://github.com/kutovoys/marzban-torrent-blocker/blob/main/README.md)
+[![ru](https://img.shields.io/badge/lang-ru-blue)](https://github.com/kutovoys/marzban-torrent-blocker/blob/main/README.ru.md)
 
 Marzban Torrent Blocker — это приложение для блокировки использования торрентов пользователями панели [Marzban](https://github.com/Gozargah/Marzban). Приложение анализирует логи, обнаруживает использование торрентов и временно блокирует пользователя, отправляя уведомления в Telegram администратору и, опционально, пользователю.
 
@@ -50,6 +51,27 @@ Marzban Torrent Blocker — это приложение для блокиров�
       },
   ```
   К сожалению, эта блокировка эффективно блокирует только около 20% трафика bittorrent.
+
+### Конфигурация Marzban
+
+- На сервере, где находится панель создайте папку `/var/lib/marzban-node`:
+
+  ```bash
+  mkdir -p /var/lib/marzban-node
+  ```
+
+- Добавьте новый volume в файле `/opt/marzban/docker-compose.yml`:
+
+  ```yaml
+  volumes:
+    - /var/lib/marzban:/var/lib/marzban
+    - /var/lib/marzban-node:/var/lib/marzban-node #новый volume
+  ```
+
+- Перезапустите панель командой:
+  ```bash
+  docker compose down --remove-orphans; docker compose up -d
+  ```
 
 ### Конфигурация нод
 

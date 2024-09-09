@@ -51,6 +51,27 @@ Marzban Torrent Blocker is an application designed to block torrent usage by use
   ```
   Unfortunately, this blocking only effectively handles about 20% of bittorrent traffic.
 
+### Marzban Configuration
+
+- On the server where the panel is hosted, create the folder `/var/lib/marzban-node`:
+
+  ```bash
+  mkdir -p /var/lib/marzban-node
+  ```
+
+- Add a new volume to the `/opt/marzban/docker-compose.yml` file:
+
+  ```yaml
+  volumes:
+    - /var/lib/marzban:/var/lib/marzban
+    - /var/lib/marzban-node:/var/lib/marzban-node #новый volume
+  ```
+
+- Restart the panel with the following command:
+  ```bash
+  docker compose down --remove-orphans; docker compose up -d
+  ```
+
 ### Node Configuration
 
 Ensure that the volume is correctly mounted in `docker-compose.yml`:
