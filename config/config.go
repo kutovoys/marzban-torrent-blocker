@@ -52,6 +52,7 @@ var (
 	Mu                   sync.Mutex
 	SendUserMessage      bool
 	SendAdminMessage     bool
+	BlockMode            string
 )
 
 type Config struct {
@@ -66,6 +67,7 @@ type Config struct {
 	SendUserMessage     bool   `yaml:"SendUserMessage"`
 	SendAdminMessage    bool   `yaml:"SendAdminMessage"`
 	UserMessageTemplate string `yaml:"UserMessageTemplate"`
+	BlockMode           string `yaml:"BlockMode"`
 }
 
 func LoadConfig(configPath string) error {
@@ -111,5 +113,10 @@ func LoadConfig(configPath string) error {
 	}
 
 	Hostname, err = os.Hostname()
+	if cfg.BlockMode != "" {
+		BlockMode = cfg.BlockMode
+	} else {
+		BlockMode = "ufw"
+	}
 	return err
 }

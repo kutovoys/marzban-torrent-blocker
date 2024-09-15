@@ -133,19 +133,34 @@ func SendTelegramMessage(chatID string, message string, botToken string, parseMo
 }
 
 func BlockIP(ip string) {
-	cmd := exec.Command("ufw", "insert", "1", "deny", "from", ip, "to", "any")
+	var cmd *exec.Cmd
+
+	if config.BlockMode == "iptables" {
+		cmd = exec.Command("iptables", "-I", "INPUT", "-s", ip, "-j", "DROP")
+	} else {
+		cmd = exec.Command("ufw", "insert", "1", "deny", "from", ip, "to", "any")
+	}
+
 	err := cmd.Run()
 	if err != nil {
-		log.Fatalf("Error blocking IP with ufw: %v", err)
+		log.Fatalf("Error blocking IP: %v", err)
 	}
 }
 
 func UnblockIPAfterDelay(ip string, delay time.Duration, username string) {
 	time.Sleep(delay)
-	cmd := exec.Command("ufw", "delete", "deny", "from", ip, "to", "any")
+
+	var cmd *exec.Cmd
+
+	if config.BlockMode == "iptables" {
+		cmd = exec.Command("iptables", "-D", "INPUT", "-s", ip, "-j", "DROP")
+	} else {
+		cmd = exec.Command("ufw", "delete", "deny", "from", ip, "to", "any")
+	}
+
 	err := cmd.Run()
 	if err != nil {
-		log.Printf("Error unblocking IP with ufw: %v", err)
+		log.Printf("Error unblocking IP: %v", err)
 		return
 	}
 

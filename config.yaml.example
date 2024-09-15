@@ -10,6 +10,12 @@ BlockDuration: 10
 # Required. Tag that the application uses to determine which log entry to process.
 TorrentTag: "TORRENT"
 
+# Опциональный. Указывает, какой инструмент использовать для блокировки IP-адресов.
+# Допустимые значения: "ufw" или "iptables". По умолчанию используется "ufw".
+# Optional. Specifies which tool to use for IP address blocking.
+# Available options: "ufw" or "iptables". Defaults to "ufw".
+BlockMode: "ufw"
+
 # Опциональный. Указывает, отправлять ли сообщение администратору при блокировке.
 # Если false или не задан, сообщения администратору не будут отправляться.
 # Optional. Determines whether to send an admin message upon blocking.
