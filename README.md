@@ -120,6 +120,8 @@ After installation, the application uses default configuration. You can customiz
 LogFile: "/var/log/remnanode/access.log"
 # Also supported journald service log reading
 # LogFile: "journald:xray-node.service"
+# and docker container log reading
+# LogFile: "docker:xray-node"
 
 # Block duration in minutes
 BlockDuration: 10

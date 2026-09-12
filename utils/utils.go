@@ -52,13 +52,18 @@ func initializeByteSearchPatterns() {
 		config.TorrentTag, len(torrentTagBytes))
 }
 
-const journaldPrefix = "journald:"
+const (
+	journaldPrefix = "journald:"
+	dockerPrefix   = "docker:"
+)
 
 func StartLogMonitor() {
 	var lines chan string
 	var err error
 	if unit, ok := strings.CutPrefix(config.LogFile, journaldPrefix); ok {
 		lines, err = startJournaldMonitor(unit)
+	} else if conteiner, ok := strings.CutPrefix(config.LogFile, dockerPrefix); ok {
+		lines, err = startDockerLogMonitor(conteiner)
 	} else {
 		lines, err = startFileMonitor(config.LogFile)
 	}
@@ -112,32 +117,38 @@ func startFileMonitor(file string) (chan string, error) {
 }
 
 func startJournaldMonitor(unit string) (chan string, error) {
+	return startCommandMonitor("journalctl",
+		"-f", "-n", "0", "-o", "cat", "-u", unit,
+	)
+}
+
+func startDockerLogMonitor(container string) (chan string, error) {
+	return startCommandMonitor("docker",
+		"logs", "-f", "--tail", "0", container,
+	)
+}
+
+func startCommandMonitor(name string, args ...string) (chan string, error) {
 	lines := make(chan string)
 
 	go func() {
 		defer close(lines)
 
-		log.Print("start journald monitoring")
+		log.Printf("start %s monitoring", name)
 		for {
-			if err := monitorJournald(unit, lines); err != nil {
-				log.Printf("journald monitoring: %v", err)
+			if err := monitorLogCmd(name, args, lines); err != nil {
+				log.Printf("%s monitoring: %v", name, err)
 			}
 			time.Sleep(1 * time.Second)
-			log.Print("restart journald monitoring")
+			log.Print("restart %s monitoring", name)
 		}
 	}()
 
 	return lines, nil
 }
 
-func monitorJournald(unit string, lines chan string) error {
-	cmd := exec.Command(
-		"journalctl",
-		"-u", unit,
-		"-f",
-		"-n", "0",
-		"-o", "cat",
-	)
+func monitorLogCmd(name string, args []string, lines chan string) error {
+	cmd := exec.Command(name, args...)
 
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Pdeathsig: syscall.SIGKILL,
@@ -145,27 +156,25 @@ func monitorJournald(unit string, lines chan string) error {
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return fmt.Errorf("journalctl pipe: %v", err)
+		return fmt.Errorf("%s logs pipe: %v", name, err)
 	}
+	cmd.Stderr = cmd.Stdout
 
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("journalctl start: %v", err)
+		return fmt.Errorf("%s logs start: %v", name, err)
 	}
-
 	defer func() {
 		if err := cmd.Wait(); err != nil {
-			log.Printf("journalctl exited: %v", err)
+			log.Printf("%s logs exited: %v", name, err)
 		}
 	}()
 
 	scanner := bufio.NewScanner(stdout)
-
 	for scanner.Scan() {
 		lines <- scanner.Text()
 	}
-
 	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("journalctl reading: %v", err)
+		return fmt.Errorf("%s logs reading: %v", name, err)
 	}
 
 	return nil

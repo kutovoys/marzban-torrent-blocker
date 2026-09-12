@@ -120,6 +120,8 @@ yum install tblocker
 LogFile: "/var/log/remnanode/access.log"
 # Поддерживается также journald-лог сервиса
 # LogFile: "journald:xray-node.service"
+# и лог docker-контейнера
+# LogFile: "docker:xray-node"
 
 # Продолжительность блокировки в минутах
 BlockDuration: 10
